@@ -1,11 +1,13 @@
 'use client';
 
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
 import { z } from 'zod';
 
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import { signIn } from "next-auth/react";
+
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   FormControl,
   FormMessage,
@@ -13,7 +15,7 @@ import {
   FormLabel,
   FormItem,
   Form,
-} from "@/components/ui/form"
+} from "@/components/ui/form";
 
 import { loginSchema } from '@/lib/zod';
 
@@ -26,10 +28,8 @@ export const FormLogin = () => {
     },
   });
 
-  function onSubmit(values: z.infer<typeof loginSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values)
+  const onSubmit = async(values: z.infer<typeof loginSchema>) => {
+    signIn('credentials', values)
   }
 
   return (
