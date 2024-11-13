@@ -1,10 +1,16 @@
 'use client';
 
-import { zodResolver } from "@hookform/resolvers/zod";
+import { useState, useTransition } from 'react';
+
+import { useRouter } from 'next/navigation';
+
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from "react-hook-form";
 import { z } from 'zod';
 
-import { signIn } from "next-auth/react";
+import { login } from "@/actions/auth";
+
+import { loginSchema } from '@/lib/zod';
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,9 +23,12 @@ import {
   Form,
 } from "@/components/ui/form";
 
-import { loginSchema } from '@/lib/zod';
-
 export const FormLogin = () => {
+  const router = useRouter();
+
+  const [error, setError] = useState<string | null>(null);
+  const [isPending, startTransition] = useTransition();
+
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -28,8 +37,17 @@ export const FormLogin = () => {
     },
   });
 
-  const onSubmit = async(values: z.infer<typeof loginSchema>) => {
-    signIn('credentials', values)
+  const onSubmit = (values: z.infer<typeof loginSchema>) => {
+    setError(null);
+    startTransition(async() => {
+      const res = await login(values);
+      
+      if (!res.success) {
+        setError(res.message);
+      } else {
+        router.push('/admin');
+      }
+    });
   }
 
   return (
@@ -71,7 +89,11 @@ export const FormLogin = () => {
           )}
         />
 
-        <Button type="submit">Submit</Button>
+        {error && (
+          <FormMessage>{error}</FormMessage>
+        )}
+
+        <Button type="submit" disabled={isPending}>Submit</Button>
       </form>
     </Form>
   )
