@@ -9,9 +9,9 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from "react-hook-form";
 import { z } from 'zod';
 
-import { loginAction } from "@/actions/auth";
+import { registerAction } from "@/actions/auth";
 
-import { loginSchema } from '@/lib/zod';
+import { registerSchema } from '@/lib/zod';
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -24,24 +24,25 @@ import {
   Form,
 } from "@/components/ui/form";
 
-export const FormLogin = () => {
+export const FormRegister = () => {
   const router = useRouter();
 
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
-  const form = useForm<z.infer<typeof loginSchema>>({
-    resolver: zodResolver(loginSchema),
+  const form = useForm<z.infer<typeof registerSchema>>({
+    resolver: zodResolver(registerSchema),
     defaultValues: {
+      name: "",
       email: "",
       password: "",
     },
   });
 
-  const onSubmit = (values: z.infer<typeof loginSchema>) => {
+  const onSubmit = (values: z.infer<typeof registerSchema>) => {
     setError(null);
     startTransition(async() => {
-      const res = await loginAction(values);
+      const res = await registerAction(values);
       
       if (!res.success) {
         setError(res.message);
@@ -54,6 +55,23 @@ export const FormLogin = () => {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+        <FormField
+          control={form.control}
+          name="name"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Nombres</FormLabel>
+              <FormControl>
+                <Input
+                  placeholder="Ingrese su nombre completo"
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
         <FormField
           control={form.control}
           name="email"
@@ -101,14 +119,15 @@ export const FormLogin = () => {
         >
           Enviar
         </Button>
+
       </form>
       
       <div className="flex justify-center mt-4">
         <Link
-          href="/auth/register"
+          href="/auth/login"
           className="text-sm underline"
         >
-          Crear una cuenta
+          Iniciar sesión
         </Link>
       </div>
     </Form>

@@ -11,12 +11,9 @@ export const loginSchema = object({
 })
 
 export const registerSchema = object({
-  names: string({ required_error: "El nombre es requerido" })
+  name: string({ required_error: "El nombre es requerido" })
     .min(1, "El nombre es requerido")
-    .max(64, "El nombre debe tener menos de 64 caracteres"),
-  lastname: string({ required_error: "El apellido es obligatorio" })
-    .min(1, "El apellido es obligatorio")
-    .max(64, "El apellido debe tener menos de 64 caracteres"),
+    .max(128, "El nombre debe tener menos de 64 caracteres"),
   email: string({ required_error: "El correo electrónico es requerido" })
     .email("Invalid email")
     .min(1, "El correo electrónico es requerido"),
